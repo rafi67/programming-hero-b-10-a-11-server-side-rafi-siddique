@@ -35,9 +35,28 @@ async function run() {
     const db = client.db("WhereIsIt");
     const itemCollection = db.collection("item");
 
-    app.get('/getAllItem', async () => {
+    app.get('/getAllItem', async (req, res) => {
       const allItems = await (itemCollection.find()).toArray();
       res.send(allItems);
+    });
+
+    app.post('/addItems', async (req, res) => {
+      const newItem = req.body;
+      const docs = {
+        name: newItem.name,
+        email: newItem.email,
+        postType: newItem.postType,
+        thumbnail: newItem.thumbnail,
+        title: newItem.title,
+        description: newItem.description,
+        category: newItem.category,
+        location: newItem.location,
+        date: newItem.date,
+        contact: newItem.contact,
+      };
+
+      const result = await itemCollection.insertOne(docs);
+      res.send(result);
     });
 
   } catch(err) {
