@@ -12,7 +12,7 @@ app.get('/', async (req, res) => {
     res.send('server is running');
 });
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.NAME}:${process.env.SECURITY_KEY}@cluster0.bk0nm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -56,6 +56,33 @@ async function run() {
       };
 
       const result = await itemCollection.insertOne(docs);
+      res.send(result);
+    });
+
+    app.put('/updateItems/:id', async (req, res) => {
+      const newItem = req.body;
+      const id = req.params.id;
+      const filter = {
+        _id: new ObjectId(id)
+      };
+      const options = {
+        upsert: true,
+      };
+
+      const docs = {
+        name: newItem.name,
+        email: newItem.email,
+        postType: newItem.postType,
+        thumbnail: newItem.thumbnail,
+        title: newItem.title,
+        description: newItem.description,
+        category: newItem.category,
+        location: newItem.location,
+        date: newItem.date,
+        contact: newItem.contact,
+      };
+
+      const result = await itemCollection.updateOne(filter, docs, options);
       res.send(result);
     });
 
