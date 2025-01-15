@@ -2,11 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 // middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/', async (req, res) => {
     res.send('server is running');
@@ -66,6 +69,18 @@ async function run() {
 
       const result = await itemCollection.insertOne(docs);
       res.send(result);
+    });
+
+    app.post('/jwt', async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
+      res.
+      cookie('token', token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+      })
+      .send({ success: true });
     });
 
     app.put('/updateItems/:id', async (req, res) => {
