@@ -7,9 +7,29 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 // middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+  ],
+  credentials: true,
+}));
 app.use(express.json());
 app.use(cookieParser());
+
+const verifyToken = (req, res, next) => {
+  const token = req?.cookies?.token;
+  if(!token) {
+    return res.status(401).send('Unauthorized Access');
+  }
+
+  jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+    if(err) {
+      return res.status(401).send({ message: 'Unauthorized Access' })
+    }
+    req.user = decoded;
+    next();
+  });
+};
 
 app.get('/', async (req, res) => {
     res.send('server is running');
@@ -38,13 +58,23 @@ async function run() {
     const db = client.db("WhereIsIt");
     const itemCollection = db.collection("item");
 
-    app.get('/getAllItem', async (req, res) => {
+    app.get('/getAllItem', verifyToken, async (req, res) => {
+      const email = req.query.email;
+
+      if(req.user.email!==email) {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+
       const allItems = await (itemCollection.find()).toArray();
       res.send(allItems);
     });
 
-    app.get('/getItem/:id', async (req, res) => {
+    app.get('/getItem/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
+      const email = req.query.email;
+      if(req.user.email!==email) {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
       const query = {
         _id: new ObjectId(id)
       };
@@ -52,7 +82,7 @@ async function run() {
       res.send(result);
     });
 
-    app.post('/addItems', async (req, res) => {
+    app.post('/addItems', verifyToken, async (req, res) => {
       const newItem = req.body;
       const docs = {
         name: newItem.name,
@@ -73,7 +103,7 @@ async function run() {
 
     app.post('/jwt', async (req, res) => {
       const user = req.body;
-      const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1h' });
       res.
       cookie('token', token, {
         httpOnly: true,
@@ -83,7 +113,13 @@ async function run() {
       .send({ success: true });
     });
 
-    app.put('/updateItems/:id', async (req, res) => {
+    app.put('/updateItems/:id', verifyToken, async (req, res) => {
+      const email = req.query.email;
+
+      if(req.user.email!==email) {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+
       const newItem = req.body;
       const id = req.params.id;
       const filter = {
@@ -110,7 +146,13 @@ async function run() {
       res.send(result);
     });
 
-    app.delete('/deleteItem/:id', async(req, res) => {
+    app.delete('/deleteItem/:id', verifyToken, async(req, res) => {
+      const email = req.query.email;
+
+      if(req.user.email!==email) {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+
       const id = req.params.id;
       const query = {
         _id: new ObjectId(id)
