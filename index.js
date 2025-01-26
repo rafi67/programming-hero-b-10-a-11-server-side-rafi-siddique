@@ -66,8 +66,13 @@ async function run() {
     const db = client.db("WhereIsIt");
     const itemCollection = db.collection("item");
 
-    app.get('/getAllItem', verifyToken, async (req, res) => {
+    app.get('/getAllItem', async (req, res) => {
       const allItems = await (itemCollection.find()).toArray();
+      res.send(allItems);
+    });
+
+    app.get('/getItem', async (req, res) => {
+      const allItems = await (itemCollection.find().limit(6)).toArray();
       res.send(allItems);
     });
 
