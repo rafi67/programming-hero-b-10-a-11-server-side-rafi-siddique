@@ -72,7 +72,7 @@ async function run() {
     });
 
     app.get('/getItem', async (req, res) => {
-      const allItems = await (itemCollection.find().limit(6)).toArray();
+      const allItems = await (itemCollection.find().sort({date: -1}).limit(6)).toArray();
       res.send(allItems);
     });
 
