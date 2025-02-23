@@ -66,7 +66,7 @@ async function run() {
     const db = client.db("WhereIsIt");
     const itemCollection = db.collection("item");
 
-    app.get('/getAllItem', async (req, res) => {
+    app.get('/getAllItem', verifyToken, async (req, res) => {
       const allItems = await (itemCollection.find()).toArray();
       res.send(allItems);
     });
@@ -129,7 +129,7 @@ async function run() {
     app.post('/jwt', async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.TOKEN_SECRET, {
-        expiresIn: '1h'
+        expiresIn: '5h'
       });
       res.
       cookie('token', token, {
@@ -140,6 +140,14 @@ async function run() {
         .send({
           success: true
         });
+    });
+
+    app.post('/logout', (req, res) => {
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: false,
+      })
+      .send({ success: true });
     });
 
     app.put('/updateItems/:id', verifyToken, async (req, res) => {
