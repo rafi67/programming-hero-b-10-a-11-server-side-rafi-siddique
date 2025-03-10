@@ -25,10 +25,16 @@ const verifyToken = (req, res, next) => {
   jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).send({
-        message: 'Unauthorized Access'
-      })
+        message: 'error',
+      });
     }
     req.user = decoded;
+    console.log('decoded', decoded);
+    if(req.body === decoded.data.email) {
+      return res.status(403).send({
+        message: 'forbidden access',
+      });
+    }
     next();
   });
 };
@@ -71,15 +77,17 @@ async function run() {
       res.send(allItems);
     });
 
-    app.get('/getItem', async (req, res) => {
-      const allItems = await (itemCollection.find().sort({date: -1}).limit(6)).toArray();
+    app.get('/getItems', async (req, res) => {
+      const allItems = await (itemCollection.find().sort({
+        date: -1
+      }).limit(6)).toArray();
       res.send(allItems);
     });
 
     app.get('/getMyItem', verifyToken, async (req, res) => {
-      const email = req.user.user.email;
+      const email = req.user.email;
 
-      if (req.user.user.email !== email) {
+      if (req.user.email !== email) {
         return res.status(403).send({
           message: 'forbidden access'
         });
@@ -92,14 +100,9 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/getItem/:id', verifyToken, async (req, res) => {
+    app.post('/getItem/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
-      const email = req.query.email;
-      if (req.user.user.email !== email) {
-        return res.status(403).send({
-          message: 'forbidden access'
-        });
-      }
+      
       const query = {
         _id: new ObjectId(id)
       };
@@ -128,9 +131,12 @@ async function run() {
 
     app.post('/jwt', async (req, res) => {
       const user = req.body;
-      const token = jwt.sign(user, process.env.TOKEN_SECRET, {
+      const token = jwt.sign({
+        data: user
+      }, process.env.TOKEN_SECRET, {
         expiresIn: '5h'
       });
+
       res.
       cookie('token', token, {
           httpOnly: true,
@@ -144,10 +150,12 @@ async function run() {
 
     app.post('/logout', (req, res) => {
       res.clearCookie('token', {
-        httpOnly: true,
-        secure: false,
-      })
-      .send({ success: true });
+          httpOnly: true,
+          secure: false,
+        })
+        .send({
+          success: true
+        });
     });
 
     app.put('/updateItems/:id', verifyToken, async (req, res) => {
