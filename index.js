@@ -29,7 +29,6 @@ const verifyToken = (req, res, next) => {
       });
     }
     req.user = decoded;
-    console.log('decoded', decoded);
     if(req.body === decoded.data.email) {
       return res.status(403).send({
         message: 'forbidden access',
