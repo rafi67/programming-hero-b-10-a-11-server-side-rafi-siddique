@@ -112,8 +112,6 @@ async function run() {
     app.post('/addItems', verifyToken, async (req, res) => {
       const newItem = req.body;
       const docs = {
-        name: newItem.name,
-        email: newItem.email,
         postType: newItem.postType,
         thumbnail: newItem.thumbnail,
         title: newItem.title,
@@ -121,7 +119,7 @@ async function run() {
         category: newItem.category,
         location: newItem.location,
         date: newItem.date,
-        contact: newItem.contact,
+        contactInformation: newItem.contactInformation,
       };
 
       const result = await itemCollection.insertOne(docs);
