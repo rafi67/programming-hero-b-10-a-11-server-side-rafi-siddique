@@ -83,19 +83,13 @@ async function run() {
       res.send(allItems);
     });
 
-    app.get('/getMyItem', verifyToken, async (req, res) => {
-      const email = req.user.email;
-
-      if (req.user.email !== email) {
-        return res.status(403).send({
-          message: 'forbidden access'
-        });
-      }
-
+    app.post('/getMyItem/', verifyToken, async (req, res) => {
+      const user = req.body;
       const query = {
-        email: email,
+        contactInformation: user,
       };
-      const result = await itemCollection.findOne(query);
+      const result = await itemCollection.find(query).toArray();
+      console.log('result:', result);
       res.send(result);
     });
 
