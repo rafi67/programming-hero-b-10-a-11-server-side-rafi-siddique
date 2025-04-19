@@ -89,7 +89,6 @@ async function run() {
         contactInformation: user,
       };
       const result = await itemCollection.find(query).toArray();
-      console.log('result:', result);
       res.send(result);
     });
 
@@ -185,14 +184,6 @@ async function run() {
     });
 
     app.delete('/deleteItem/:id', verifyToken, async (req, res) => {
-      const email = req.query.email;
-
-      if (req.user.user.email !== email) {
-        return res.status(403).send({
-          message: 'forbidden access'
-        });
-      }
-
       const id = req.params.id;
       const query = {
         _id: new ObjectId(id)
