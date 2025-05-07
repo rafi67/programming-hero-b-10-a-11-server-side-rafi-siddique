@@ -29,7 +29,7 @@ const verifyToken = (req, res, next) => {
       });
     }
     req.user = decoded;
-    if(req.body === decoded.data.email) {
+    if (req.body === decoded.data.email) {
       return res.status(403).send({
         message: 'forbidden access',
       });
@@ -70,6 +70,7 @@ async function run() {
 
     const db = client.db("WhereIsIt");
     const itemCollection = db.collection("item");
+    const recoveredCollection = db.collection('recoveredItems');
 
     app.get('/getAllItem', verifyToken, async (req, res) => {
       const allItems = await (itemCollection.find()).toArray();
@@ -92,9 +93,9 @@ async function run() {
       res.send(result);
     });
 
-    app.post('/getItem/:id', verifyToken, async (req, res) => {
+    app.get('/getItem/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
-      
+
       const query = {
         _id: new ObjectId(id)
       };
@@ -112,10 +113,25 @@ async function run() {
         category: newItem.category,
         location: newItem.location,
         date: newItem.date,
+        recovered: newItem.recovered,
         contactInformation: newItem.contactInformation,
       };
 
       const result = await itemCollection.insertOne(docs);
+      res.send(result);
+    });
+
+
+    app.post('/addRecoveredItem', verifyToken, async (req, res) => {
+      const newItem = req.body;
+      const docs = {
+        itemID: newItem.itemID,
+        recoveredLocation: newItem.recoveredLocation,
+        date: newItem.date,
+        recoveredPerson: newItem.recoveredPerson,
+      };
+
+      const result = await recoveredCollection.insertOne(docs);
       res.send(result);
     });
 
@@ -149,15 +165,7 @@ async function run() {
     });
 
     app.put('/updateItems/:id', verifyToken, async (req, res) => {
-      const email = req.query.email;
-
-      if (req.user.user.email !== email) {
-        return res.status(403).send({
-          message: 'forbidden access'
-        });
-      }
-
-      const newItem = req.body;
+      const updateItem = req.body;
       const id = req.params.id;
       const filter = {
         _id: new ObjectId(id)
@@ -167,19 +175,31 @@ async function run() {
       };
 
       const docs = {
-        name: newItem.name,
-        email: newItem.email,
-        postType: newItem.postType,
-        thumbnail: newItem.thumbnail,
-        title: newItem.title,
-        description: newItem.description,
-        category: newItem.category,
-        location: newItem.location,
-        date: newItem.date,
-        contact: newItem.contact,
+        name: updateItem.name,
+        email: updateItem.email,
+        postType: updateItem.postType,
+        thumbnail: updateItem.thumbnail,
+        title: updateItem.title,
+        description: updateItem.description,
+        category: updateItem.category,
+        location: updateItem.location,
+        date: updateItem.date,
+        recovered: updateItem.recovered,
+        contact: updateItem.contact,
       };
 
       const result = await itemCollection.updateOne(filter, docs, options);
+      res.send(result);
+    });
+
+
+    app.put('/statusUpdate/:id', verifyToken, async (req, res) => {
+      const id = req.params.id;
+
+      const result = await itemCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { recovered: true } },
+      );
       res.send(result);
     });
 
