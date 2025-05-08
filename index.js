@@ -167,28 +167,22 @@ async function run() {
     app.put('/updateItems/:id', verifyToken, async (req, res) => {
       const updateItem = req.body;
       const id = req.params.id;
-      const filter = {
+
+      const result = await itemCollection.updateOne({
         _id: new ObjectId(id)
-      };
-      const options = {
-        upsert: true,
-      };
-
-      const docs = {
-        name: updateItem.name,
-        email: updateItem.email,
-        postType: updateItem.postType,
-        thumbnail: updateItem.thumbnail,
-        title: updateItem.title,
-        description: updateItem.description,
-        category: updateItem.category,
-        location: updateItem.location,
-        date: updateItem.date,
-        recovered: updateItem.recovered,
-        contact: updateItem.contact,
-      };
-
-      const result = await itemCollection.updateOne(filter, docs, options);
+      }, {
+        $set: {
+          postType: updateItem.postType,
+          thumbnail: updateItem.thumbnail,
+          title: updateItem.title,
+          description: updateItem.description,
+          category: updateItem.category,
+          location: updateItem.location,
+          date: updateItem.date,
+          recovered: updateItem.recovered,
+          contact: updateItem.contact,
+        }
+      }, );
       res.send(result);
     });
 
@@ -196,10 +190,13 @@ async function run() {
     app.put('/statusUpdate/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
 
-      const result = await itemCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: { recovered: true } },
-      );
+      const result = await itemCollection.updateOne({
+        _id: new ObjectId(id)
+      }, {
+        $set: {
+          recovered: true
+        }
+      }, );
       res.send(result);
     });
 
