@@ -84,6 +84,11 @@ async function run() {
       res.send(allItems);
     });
 
+    app.get('/getRecoveredItems', verifyToken, async (req, res) => {
+      const recoveredItems = await(recoveredCollection.find().toArray());
+      res.send(recoveredItems);
+    });
+
     app.post('/getMyItem/', verifyToken, async (req, res) => {
       const user = req.body;
       const query = {
@@ -187,7 +192,7 @@ async function run() {
     });
 
 
-    app.put('/statusUpdate/:id', verifyToken, async (req, res) => {
+    app.put('/statusUpdate/:id', async (req, res) => {
       const id = req.params.id;
 
       const result = await itemCollection.updateOne({
