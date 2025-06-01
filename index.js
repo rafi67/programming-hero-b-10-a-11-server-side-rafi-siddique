@@ -85,8 +85,35 @@ async function run() {
     });
 
     app.get('/getRecoveredItems', verifyToken, async (req, res) => {
-      const recoveredItems = await(recoveredCollection.find().toArray());
+      const recoveredItems = await (recoveredCollection.find().toArray());
       res.send(recoveredItems);
+    });
+
+    app.get('/getRecoveredItemAndDetails', verifyToken, async (req, res) => {
+      const result = await itemCollection.aggregate([
+        {
+          $match: { recovered: true },
+        },
+        {
+          $lookup: {
+            from: "recoveredItems",
+            localField: "_id",
+            foreignField: "itemID",
+            as: "recovered"
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            thumbnail: 1,
+            title: 1,
+            contactInformation: 1,
+            date: 1,
+            location: 1,
+          },
+        },
+      ]).toArray();
+      res.send(result);
     });
 
     app.post('/getMyItem/', verifyToken, async (req, res) => {
