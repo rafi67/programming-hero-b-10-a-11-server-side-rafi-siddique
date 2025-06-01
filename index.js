@@ -29,11 +29,6 @@ const verifyToken = (req, res, next) => {
       });
     }
     req.user = decoded;
-    if (req.body === decoded.data.email) {
-      return res.status(403).send({
-        message: 'forbidden access',
-      });
-    }
     next();
   });
 };
@@ -90,9 +85,10 @@ async function run() {
     });
 
     app.get('/getRecoveredItemAndDetails', verifyToken, async (req, res) => {
-      const result = await itemCollection.aggregate([
-        {
-          $match: { recovered: true },
+      const result = await itemCollection.aggregate([{
+          $match: {
+            recovered: true
+          },
         },
         {
           $lookup: {
@@ -117,6 +113,11 @@ async function run() {
     });
 
     app.post('/getMyItem/', verifyToken, async (req, res) => {
+      if (req.body === req.user.data.email) {
+        return res.status(403).send({
+          message: 'forbidden access',
+        });
+      }
       const user = req.body;
       const query = {
         contactInformation: user,
@@ -233,6 +234,11 @@ async function run() {
     });
 
     app.delete('/deleteItem/:id', verifyToken, async (req, res) => {
+      if (req.body === req.user.data.email) {
+        return res.status(403).send({
+          message: 'forbidden access',
+        });
+      }
       const id = req.params.id;
       const query = {
         _id: new ObjectId(id)
