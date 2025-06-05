@@ -67,7 +67,7 @@ async function run() {
     const itemCollection = db.collection("item");
     const recoveredCollection = db.collection('recoveredItems');
 
-    app.get('/getAllItem', verifyToken, async (req, res) => {
+    app.get('/getAllItem', async (req, res) => {
       const allItems = await (itemCollection.find()).toArray();
       res.send(allItems);
     });
