@@ -9,7 +9,7 @@ require('dotenv').config();
 // middleware
 app.use(cors({
   origin: [
-    'http://localhost:5173',
+    'https://whereisit-27b8c.web.app',
   ],
   credentials: true,
 }));
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 const verifyToken = (req, res, next) => {
-  const token = req?.cookies?.token;
+  const token = req.cookies.token;
   if (!token) {
     return res.status(401).send('Unauthorized Access');
   }
@@ -56,11 +56,11 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({
-      ping: 1
-    });
+    // await client.db("admin").command({
+    //   ping: 1
+    // });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     const db = client.db("WhereIsIt");
@@ -113,7 +113,9 @@ async function run() {
     });
 
     app.post('/getMyItem/', verifyToken, async (req, res) => {
-      if (req.body === req.user.data.email) {
+      const clientEmail = req.body.email;
+      const email = req.user.data.email;
+      if (clientEmail !== email) {
         return res.status(403).send({
           message: 'forbidden access',
         });
@@ -179,8 +181,8 @@ async function run() {
       res.
       cookie('token', token, {
           httpOnly: true,
-          secure: false,
-          sameSite: 'strict',
+          secure: true,
+          sameSite: 'None',
         })
         .send({
           success: true
@@ -234,11 +236,6 @@ async function run() {
     });
 
     app.delete('/deleteItem/:id', verifyToken, async (req, res) => {
-      if (req.body === req.user.data.email) {
-        return res.status(403).send({
-          message: 'forbidden access',
-        });
-      }
       const id = req.params.id;
       const query = {
         _id: new ObjectId(id)
@@ -251,7 +248,7 @@ async function run() {
   } catch (err) {
     console.log(err.message);
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
