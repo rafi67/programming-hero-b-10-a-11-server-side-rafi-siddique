@@ -12,8 +12,6 @@ A "Where is it" server is a computer system that helps you find the location of 
 - <a href="https://whereisit-server.vercel.app/getRecoveredItemAndDetails">/getRecoveredItemAndDetails</a>
 - <a href="https://whereisit-server.vercel.app/getMyItem/">/getMyItem</a>
 - <a href="https://whereisit-server.vercel.app/getItem/:id">/getItem/:id</a>
-- <a href="https://whereisit-server.vercel.app/getItem/:id">/getItem/:id</a>
-- <a href="https://whereisit-server.vercel.app/addItems">/addItems</a>
 - <a href="https://whereisit-server.vercel.app/addItems">/addItems</a>
 - <a href="https://whereisit-server.vercel.app/addRecoveredItem">/addRecoveredItem</a>
 - <a href="https://whereisit-server.vercel.app/jwt">/jwt</a>
