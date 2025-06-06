@@ -1,7 +1,5 @@
 # <a href="https://whereisit-server.vercel.app/">WhereIsIt Server</a>
-Crowdcube is a prominent crowdfunding platform that enables businesses, particularly startups, to raise capital by offering equity to investors. It operates as an equity crowdfunding platform, meaning investors receive a stake in the company in exchange for their contributions. Unlike donation-based crowdfunding, which funds personal needs or creative projects without offering financial returns, Crowdcube focuses on businesses seeking to scale or develop.
-
-This model appeals to entrepreneurs who want to secure funding while also building a community of supporters who have a vested interest in their success. Investors, in turn, gain an opportunity to support businesses they believe in and potentially earn a return on their investment if the business grows.
+A "Where is it" server is a computer system that helps you find the location of something. It stores information about different items, such as files, websites, or devices, and tells you where they are when you ask. For example, if you are looking for a file or a website, the "Where is it" server can guide you to the exact place where it is saved or hosted. This type of server is useful for keeping track of many things in a large system, so you can quickly find what you need without searching everywhere manually.
 
 ## Live Link
 <a href="https://whereisit-server.vercel.app/">Live</a>
